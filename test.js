@@ -10,3 +10,4 @@ mongoClient.connect("mongodb://localhost:27017/CS_DEV", (err, db) => {
     db.close();
   });
 });
+console.log("hello");
