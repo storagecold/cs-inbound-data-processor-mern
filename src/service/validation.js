@@ -1,37 +1,35 @@
+const mongoClient = require("mongodb").MongoClient;
 const utils = require("./../util/utils");
 const http = require("http");
-const URLCOLDDB = require("./../util/constants");
+const URL_CS_DEV = require("./../util/constants");
 
 function validateFile(dataFile) {
   let isColdExist = false;
   const submitter = utils.getSubmitter(dataFile);
+  isColdExist = isColdExists(submitter);
 
-  const submitterDB = isColdExists(submitter);
-  if (submitterDB) {
-    isColdExist = true;
-  }
   return isColdExist;
+}
+function getResult(err, result) {
+  if (err) throw err;
+  if (submitter === result.submitterId) {
+    console.log(result.submitterId);
+    isSubmitterExists = true;
+  } else {
+    isSubmitterExists = false;
+  }
+  db.close();
 }
 
 function isColdExists(submitter) {
-  const db = getDatabaseObject();
-  var dbo = db.db("coldDB");
-  dbo.collection("amad").findOne({}, function (err, result) {
+  let isSubmitterExists = false;
+  mongoClient.connect("mongodb://localhost:27017/CS_DEV", (err, db) => {
     if (err) throw err;
-    console.log(result.party);
-    db.close();
+    console.log("connected to database========");
+    var dbo = db.db("CS_DEV");
+    dbo.collection("coldInfo").findOne({}, getResult);
   });
-}
-
-function getDatabaseObject() {
-  const mongoClient = require("mongodb").MongoClient;
-  const dbo = null;
-  mongoClient.connect(URLCOLDDB, (err, db) => {
-    if (err) throw err;
-    console.log("connected to database-----> ");
-    dbo = db;
-  });
-  return dbo;
+  return isSubmitterExists;
 }
 
 module.exports = { validateFile };

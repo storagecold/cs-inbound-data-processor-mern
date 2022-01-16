@@ -4,6 +4,7 @@ const constants = require("./../util/constants");
 const validation = require("./../service/validation");
 const path = require("path");
 
+//scheduler, run every 2 seconds.
 function start() {
   schedule.scheduleJob("*/2 * * * * *", run);
 }
@@ -27,6 +28,7 @@ function processTrigFiles() {
   const trigFiles = getTrigFiles(files);
   if (trigFiles.length > 0) {
     trigFiles.forEach((trigFile) => {
+      console.log(`start processing file: ${trigFile}`);
       processTrigFile(trigFile);
     });
   }
@@ -42,13 +44,12 @@ function getTrigFiles(files) {
 
 function processTrigFile(trigFile) {
   try {
-    console.log(constants.INBOUND + trigFile);
     if (fs.existsSync(constants.INBOUND + trigFile)) {
       //file exists
       console.log(`trigFile: ${trigFile}`);
       let dataFile = trigFile.replace(".trig", "");
       console.log(`dataFile: ${dataFile}`);
-      processDataFile(trigFile, dataFile);
+      processDataFile(dataFile);
     } else {
       console.log(`trig file: ${trigFile} does not exists`);
     }
@@ -57,10 +58,16 @@ function processTrigFile(trigFile) {
   }
 }
 
-function processDataFile(trigFile, dataFile) {
+function processDataFile(dataFile) {
   try {
     if (fs.existsSync(constants.INBOUND + dataFile)) {
-      validation.validateFile(dataFile);
+      let isValidFile = false;
+      isValidFile = validation.validateFile(dataFile);
+      if(isValidFile){
+        readDataFile();
+      }else{
+        console.log(`dataFile: ${dataFile} is not a valid file`);
+      }
     } else {
       console.log(`dataFile: ${dataFile} does not exists`);
     }
