@@ -18,7 +18,11 @@
   },
   "homepage": "https://github.com/storagecold/cs-inbound-data-processor-mern#readme",
   "dependencies": {
+    "body-parser": "^1.19.1",
+    "express": "^4.17.2",
     "mongodb": "^4.3.0",
+    "mongoose": "^6.1.6",
+    "node-adodb": "^5.0.3",
     "node-schedule": "^2.1.0"
   },
   "devDependencies": {

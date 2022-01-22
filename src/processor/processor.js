@@ -1,6 +1,7 @@
 const schedule = require("node-schedule");
 const fs = require("fs");
 const constants = require("./../util/constants");
+const fileReader = require("./fileReader");
 const validation = require("./../service/validation");
 const path = require("path");
 
@@ -61,11 +62,11 @@ function processTrigFile(trigFile) {
 function processDataFile(dataFile) {
   try {
     if (fs.existsSync(constants.INBOUND + dataFile)) {
-      let isValidFile = false;
-      isValidFile = validation.validateFile(dataFile);
-      if(isValidFile){
-        readDataFile();
-      }else{
+      let isValidFile = true;
+      // isValidFile = validation.validateFile(dataFile);
+      if (isValidFile) {
+        fileReader.readDataFile(dataFile);
+      } else {
         console.log(`dataFile: ${dataFile} is not a valid file`);
       }
     } else {
