@@ -6,32 +6,31 @@ const validation = require("./../service/validation");
 const path = require("path");
 
 //scheduler, run every 2 seconds.
-function start() {
-  schedule.scheduleJob("*/2 * * * * *", run);
+async function start() {
+  await schedule.scheduleJob("*/2 * * * * *", run);
 }
 
-function run() {
+async function run() {
   console.log("processing started ==> " + new Date());
   try {
     if (fs.existsSync(constants.STOP)) {
       //file exists
       console.log("stop file exists, hence stopped further processing");
     } else {
-      processTrigFiles();
+      await processTrigFiles();
     }
   } catch (err) {
     console.error(err);
   }
 }
 
-function processTrigFiles() {
+async function processTrigFiles() {
   let files = fs.readdirSync(constants.INBOUND);
   const trigFiles = getTrigFiles(files);
-  if (trigFiles.length > 0) {
-    trigFiles.forEach((trigFile) => {
-      console.log(`start processing file: ${trigFile}`);
-      processTrigFile(trigFile);
-    });
+
+  for (let i = 0; i < trigFiles.length; i++) {
+    console.log(`start processing file: ${trigFiles[i]}`);
+    await processTrigFile(trigFiles[i]);
   }
 }
 
@@ -43,14 +42,14 @@ function getTrigFiles(files) {
   return targetFiles;
 }
 
-function processTrigFile(trigFile) {
+async function processTrigFile(trigFile) {
   try {
     if (fs.existsSync(constants.INBOUND + trigFile)) {
       //file exists
       console.log(`trigFile: ${trigFile}`);
       let dataFile = trigFile.replace(".trig", "");
       console.log(`dataFile: ${dataFile}`);
-      processDataFile(dataFile);
+      await processDataFile(dataFile);
     } else {
       console.log(`trig file: ${trigFile} does not exists`);
     }
@@ -59,13 +58,13 @@ function processTrigFile(trigFile) {
   }
 }
 
-function processDataFile(dataFile) {
+async function processDataFile(dataFile) {
   try {
     if (fs.existsSync(constants.INBOUND + dataFile)) {
       let isValidFile = true;
       // isValidFile = validation.validateFile(dataFile);
       if (isValidFile) {
-        fileReader.readDataFile(dataFile);
+        await fileReader.readDataFile(dataFile);
       } else {
         console.log(`dataFile: ${dataFile} is not a valid file`);
       }
