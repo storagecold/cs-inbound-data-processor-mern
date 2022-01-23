@@ -1,31 +1,38 @@
 //imports
 const constants = require("./../util/constants");
 const ADODB = require("node-adodb");
-const url = "mongodb://localhost:27017/CS_DEV";
-// Connect to the MS Access DB
-readDataFile("test");
-function readDataFile(dataFile) {
+const { MongoClient } = require("mongodb");
+
+async function readDataFile(dataFile) {
+  const client = new MongoClient(constants.URL_CS_DEV);
+  try {
+    await client.connect();
+    //
+    await readAmad(client, dataFile);
+    //
+  } catch (e) {
+    console.error(e);
+  } finally {
+    await client.close();
+  }
+}
+
+async function readAmad(client, dataFile) {
   const connection = ADODB.open(
-    "Provider=Microsoft.Jet.OLEDB.4.0;Data Source=C:/Users/HP/Desktop/coldstorage/data/inbound/lodhirajcs.2021.mdb;Persist Security Info=False;"
+    `Provider=Microsoft.Jet.OLEDB.4.0;Data Source=C:/Users/HP/Desktop/coldstorage/data/inbound/${dataFile};Persist Security Info=False;`
   );
   // Query the DB
-  connection
-    .query("SELECT PARTY,AMADNO,VILL,MARK1 FROM amad")
-    .then((data) => {
-      console.log(JSON.stringify(data, null, 2));
-      MongoClient.connect(url, function (err, db) {
-        if (err) throw err;
-        var dbo = db.db("mydb");
-        dbo.collection("amad").insertOne(data, function (err, res) {
-          if (err) throw err;
-          console.log("1 document inserted");
-          db.close();
-        });
-      });
-    })
-    .catch((error) => {
-      console.error(error);
-    });
+  const data = await connection.query(
+    "SELECT PARTY,AMADNO,VILL,MARK1 FROM amad"
+  );
+  const options = { ordered: true };
+
+  console.log(JSON.stringify(data, null, 2));
+  const result = await client
+    .db("CS_DEV")
+    .collection("amad")
+    .insertMany(data, options);
+  console.log(`${result.insertedCount} documents were inserted`);
 }
 
 //exports
