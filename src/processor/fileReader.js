@@ -1,5 +1,6 @@
 //imports
 const constants = require("./../util/constants");
+const SQL = require("./../util/sql");
 const ADODB = require("node-adodb");
 const { MongoClient } = require("mongodb");
 
@@ -22,12 +23,10 @@ async function readAmad(client, dataFile) {
     `Provider=Microsoft.Jet.OLEDB.4.0;Data Source=C:/Users/HP/Desktop/coldstorage/data/inbound/${dataFile};Persist Security Info=False;`
   );
   // Query the DB
-  const data = await connection.query(
-    "SELECT PARTY,AMADNO,VILL,MARK1 FROM amad"
-  );
+  const data = await connection.query(SQL.AMAD);
   const options = { ordered: true };
 
-  console.log(JSON.stringify(data, null, 2));
+  //console.log(JSON.stringify(data, null, 2));
   const result = await client
     .db("CS_DEV")
     .collection("amad")
