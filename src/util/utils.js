@@ -1,16 +1,13 @@
-const constants = require('./constants')
+const fs = require("fs");
+const constants = require("./constants");
 function getSubmitter(dataFile) {
-  return dataFile.substring(0, dataFile.indexOf('.'))
+  return dataFile.substring(0, dataFile.indexOf("."));
 }
 
 function archive(fileName) {
   const src = constants.INBOUND + fileName;
   const dest = constants.ARCHIVE + fileName;
-
-  // fs.move(src, dest, (err) => {
-  //   if (err) return console.log(err)
-  //   console.log(`File successfully moved!!`)
-  // })
+  fs.renameSync(src, dest);
 }
 
-module.exports = { getSubmitter, archive }
+module.exports = { getSubmitter, archive };

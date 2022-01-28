@@ -47,13 +47,13 @@ async function processTrigFile(trigFile) {
   try {
     if (fs.existsSync(constants.INBOUND + trigFile)) {
       //file exists
-      console.log(`trigFile: ${trigFile}`)
-      let dataFile = trigFile.replace('.trig', '')
-      console.log(`dataFile: ${dataFile}`)
-      await processDataFile(dataFile)
+      console.log(`trigFile: ${trigFile}`);
+      let dataFile = trigFile.replace(".trig", "");
+      console.log(`dataFile: ${dataFile}`);
+      await processDataFile(dataFile);
       //archive data and trig file.
-      utils.archive(trigFile)
-      utils.archive(dataFile)
+      utils.archive(trigFile);
+      utils.archive(dataFile);
     } else {
       console.log(`trig file: ${trigFile} does not exists`)
     }
