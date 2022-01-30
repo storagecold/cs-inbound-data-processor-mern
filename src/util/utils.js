@@ -1,7 +1,7 @@
 const fs = require("fs");
 const constants = require("./constants");
-function getSubmitter(dataFile) {
-  return dataFile.substring(0, dataFile.indexOf("."));
+function getSubmitter(fileName) {
+  return fileName.substring(0, fileName.indexOf("."));
 }
 
 function archive(fileName) {
@@ -10,4 +10,10 @@ function archive(fileName) {
   fs.renameSync(src, dest);
 }
 
-module.exports = { getSubmitter, archive };
+function moveToError(fileName) {
+  const src = constants.INBOUND + fileName;
+  const dest = constants.ERROR + fileName;
+  fs.renameSync(src, dest);
+}
+
+module.exports = { getSubmitter, archive, moveToError };

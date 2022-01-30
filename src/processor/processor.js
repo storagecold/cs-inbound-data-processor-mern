@@ -59,15 +59,22 @@ function getTrigFiles(files) {
 
 async function processTrigFile(trigFile) {
   try {
+    //file exists
     if (fs.existsSync(constants.INBOUND + trigFile)) {
-      //file exists
+      const dataFile = trigFile.replace(".trig", "");
       loggger.info(`trigFile: ${trigFile}`);
-      let dataFile = trigFile.replace(".trig", "");
       loggger.info(`dataFile: ${dataFile}`);
-      await processDataFile(dataFile);
-      //archive data and trig file.
-      utils.archive(trigFile);
-      utils.archive(dataFile);
+      const isValidFile = await validation.validateFile(trigFile);
+      if (isValidFile) {
+        await processDataFile(dataFile);
+        //archive data and trig file.
+        utils.archive(trigFile);
+        utils.archive(dataFile);
+      } else {
+        console.log(`trigFile: ${trigFile} is not a valid file`);
+        utils.moveToError(trigFile);
+        utils.moveToError(dataFile);
+      }
     } else {
       loggger.info(`trig file: ${trigFile} does not exists`);
     }
@@ -79,13 +86,8 @@ async function processTrigFile(trigFile) {
 async function processDataFile(dataFile) {
   try {
     if (fs.existsSync(constants.INBOUND + dataFile)) {
-      let isValidFile = true;
-      // isValidFile = validation.validateFile(dataFile);
-      if (isValidFile) {
-        await fileReader.readDataFile(dataFile);
-      } else {
-        console.log(`dataFile: ${dataFile} is not a valid file`);
-      }
+      const isValidFile = await validation.validateFile(dataFile);
+      await fileReader.readDataFile(dataFile);
     } else {
       console.log(`dataFile: ${dataFile} does not exists`);
     }

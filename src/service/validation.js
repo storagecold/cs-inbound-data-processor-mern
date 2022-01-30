@@ -1,35 +1,35 @@
-const mongoClient = require("mongodb").MongoClient;
 const utils = require("./../util/utils");
-const http = require("http");
-const URL_CS_DEV = require("./../util/constants");
+const constants = require("./../util/constants");
+const { MongoClient } = require("mongodb");
+const config = require("./../config/config");
+const loggger = config.logger;
 
-function validateFile(dataFile) {
-  let isColdExist = false;
-  const submitter = utils.getSubmitter(dataFile);
-  isColdExist = isColdExists(submitter);
-
-  return isColdExist;
+async function validateFile(fileName) {
+  const submitter = utils.getSubmitter(fileName);
+  return await isColdExists(submitter);
 }
-function getResult(err, result) {
-  if (err) throw err;
-  if (submitter === result.submitterId) {
-    console.log(result.submitterId);
-    isSubmitterExists = true;
-  } else {
-    isSubmitterExists = false;
+
+async function isColdExists(submitter) {
+  let isColdAvailable = false;
+  const client = new MongoClient(constants.URL_CS_DEV);
+  try {
+    await client.connect();
+    let query = {
+      submitterId: submitter,
+    };
+    const result = await client
+      .db("CS_DEV")
+      .collection("coldInfo")
+      .findOne(query, { submitterId: 1, _id: 0 });
+    if (result) {
+      isColdAvailable = true;
+    }
+  } catch (e) {
+    console.error(e);
+  } finally {
+    await client.close();
   }
-  db.close();
-}
-
-function isColdExists(submitter) {
-  let isSubmitterExists = false;
-  mongoClient.connect("mongodb://localhost:27017/CS_DEV", (err, db) => {
-    if (err) throw err;
-    console.log("connected to database========");
-    var dbo = db.db("CS_DEV");
-    dbo.collection("coldInfo").findOne({}, getResult);
-  });
-  return isSubmitterExists;
+  return isColdAvailable;
 }
 
 module.exports = { validateFile };
