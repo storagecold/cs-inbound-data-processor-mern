@@ -1,3 +1,5 @@
+const config = require("./config/config");
 const processor = require("./processor/processor");
-console.log("-----Application Started----");
+const loggger = config.logger;
+loggger.info("-----Application Started----");
 processor.start();
