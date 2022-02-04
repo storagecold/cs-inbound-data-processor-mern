@@ -1,6 +1,5 @@
 const schedule = require("node-schedule");
 const fs = require("fs");
-const constants = require("./../util/constants");
 const utils = require("./../util/utils");
 const fileReader = require("./fileReader");
 const validation = require("./../service/validation");
@@ -13,13 +12,13 @@ let isAnotherFileInProgress = false;
 //scheduler, run every 2 seconds.
 async function start() {
   loggger.info("in start() method of processor.js");
-  await schedule.scheduleJob("*/60 * * * * *", run);
+  await schedule.scheduleJob("*/120 * * * * *", run);
 }
 
 async function run() {
   loggger.info("in run() method() of processor.js");
   try {
-    if (fs.existsSync(constants.STOP)) {
+    if (fs.existsSync(config.STOP)) {
       //file exists
       loggger.info("stop file exists, hence stopped further processing");
     } else {
@@ -31,7 +30,7 @@ async function run() {
 }
 
 async function processTrigFiles() {
-  let files = fs.readdirSync(constants.INBOUND);
+  let files = fs.readdirSync(config.INBOUND);
   const trigFiles = getTrigFiles(files);
   if (trigFiles.length != 0) {
     for (let i = 0; i < trigFiles.length; i++) {
@@ -60,7 +59,7 @@ function getTrigFiles(files) {
 async function processTrigFile(trigFile) {
   try {
     //file exists
-    if (fs.existsSync(constants.INBOUND + trigFile)) {
+    if (fs.existsSync(config.INBOUND + trigFile)) {
       const dataFile = trigFile.replace(".trig", "");
       loggger.info(`trigFile: ${trigFile}`);
       loggger.info(`dataFile: ${dataFile}`);
@@ -85,7 +84,7 @@ async function processTrigFile(trigFile) {
 
 async function processDataFile(dataFile) {
   try {
-    if (fs.existsSync(constants.INBOUND + dataFile)) {
+    if (fs.existsSync(config.INBOUND + dataFile)) {
       const isValidFile = await validation.validateFile(dataFile);
       await fileReader.readDataFile(dataFile);
     } else {

@@ -5,4 +5,15 @@ const logger = createLogger({
   transports: [new transports.Console({})],
 });
 
-module.exports = { logger };
+// config.js
+const dotenv = require("dotenv");
+dotenv.config();
+const NODE_ENV = process.env.NODE_ENV;
+const PORT = process.env.PORT;
+const INBOUND = process.env.INBOUND;
+const ARCHIVE = process.env.ARCHIVE;
+const ERROR = process.env.ERROR;
+const STOP = process.env.STOP;
+const URL_CS_DEV = process.env.URL_CS_DEV;
+
+module.exports = { logger, NODE_ENV, PORT, INBOUND, ARCHIVE, STOP, URL_CS_DEV };

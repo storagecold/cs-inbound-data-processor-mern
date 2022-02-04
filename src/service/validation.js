@@ -1,5 +1,4 @@
 const utils = require("./../util/utils");
-const constants = require("./../util/constants");
 const { MongoClient } = require("mongodb");
 const config = require("./../config/config");
 const loggger = config.logger;
@@ -11,7 +10,7 @@ async function validateFile(fileName) {
 
 async function isColdExists(submitter) {
   let isColdAvailable = false;
-  const client = new MongoClient(constants.URL_CS_DEV);
+  const client = new MongoClient(config.URL_CS_DEV);
   try {
     await client.connect();
     let query = {
@@ -25,7 +24,7 @@ async function isColdExists(submitter) {
       isColdAvailable = true;
     }
   } catch (e) {
-    console.error(e);
+    loggger.error(e);
   } finally {
     await client.close();
   }
