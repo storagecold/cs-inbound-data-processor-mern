@@ -1,18 +1,62 @@
 const mongoose = require("mongoose");
 const amadSchema = new mongoose.Schema(
   {
-    coldId: String,
-    amadNo: Number,
-    date: Date,
-    party: String,
-    village: String,
-    commodity: String,
-    kism: String,
-    lotNo: String,
-    year: Number,
-    chamberNo: Number,
-    chatta: Number,
-    gulla: Number,
+    coldId: {
+      type: String,
+      require: true,
+    },
+    amadNo: {
+      type: Number,
+      require: true,
+    },
+    entryDate: {
+      type: Date,
+      require: true,
+    },
+    party: {
+      type: String,
+      require: true,
+    },
+    village: {
+      type: String,
+      require: true,
+    },
+    packets: {
+      type: Number,
+      require: true,
+    },
+    commodity: {
+      type: String,
+      require: false,
+      default: "",
+    },
+    kism: {
+      type: String,
+      require: false,
+      default: " ",
+    },
+    lotNo: {
+      type: String,
+      require: true,
+    },
+    year: {
+      type: Number,
+      require: true,
+    },
+    chamberNo: {
+      type: Number,
+      require: true,
+    },
+    chatta: {
+      type: Number,
+      require: false,
+      default: 0,
+    },
+    gulla: {
+      type: Number,
+      require: false,
+      default: 0,
+    },
     createdAt: {
       type: Date,
       default: () => Date.now(),
