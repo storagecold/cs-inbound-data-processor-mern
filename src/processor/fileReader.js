@@ -18,7 +18,7 @@ async function readDataFile(dataFile) {
     await readAmad(connection, dataFile);
     //load Grp
   } catch (e) {
-    console.error(e);
+    loggger.error(e);
   }
 }
 
@@ -34,13 +34,13 @@ async function readAmad(connection, dataFile) {
         const amad = await Amad.create({
           coldId: coldId,
           amadNo: amadRecord.AMADNO,
-          date: amadRecord.DATE,
-          party: amadRecord.PARTY.trim(),
-          village: amadRecord.VILL.trim(),
+          entryDate: amadRecord.DATE,
+          party: amadRecord.PARTY,
+          village: amadRecord.VILL,
           packets: amadRecord.PKT3,
-          commodity: amadRecord.COMM.trim(),
-          kism: amadRecord.KISM.trim(),
-          lotNo: amadRecord.MARK1.trim(),
+          commodity: amadRecord.COMM,
+          kism: amadRecord.KISM,
+          lotNo: amadRecord.MARK1,
           year: amadRecord.DATE.substring(0, 4),
           chamberNo: amadRecord.Room,
           chatta: amadRecord.chatta,

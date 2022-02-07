@@ -78,14 +78,13 @@ async function processTrigFile(trigFile) {
       loggger.info(`trig file: ${trigFile} does not exists`);
     }
   } catch (err) {
-    console.error(err);
+    loggger.error(err);
   }
 }
 
 async function processDataFile(dataFile) {
   try {
     if (fs.existsSync(config.INBOUND + dataFile)) {
-      const isValidFile = await validation.validateFile(dataFile);
       await fileReader.readDataFile(dataFile);
     } else {
       console.log(`dataFile: ${dataFile} does not exists`);

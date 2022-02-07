@@ -4,22 +4,33 @@ const amadSchema = new mongoose.Schema(
     coldId: {
       type: String,
       require: true,
+      minLength: 8,
+      index: true,
     },
     amadNo: {
       type: Number,
+      min: 0,
       require: true,
+      index: true,
     },
     entryDate: {
       type: Date,
       require: true,
+      default: () => Date.now(),
     },
     party: {
       type: String,
       require: true,
+      minLength: 1,
+      trim: true,
+      index: true,
     },
     village: {
       type: String,
+      minLength: 1,
       require: true,
+      trim: true,
+      index: true,
     },
     packets: {
       type: Number,
@@ -28,20 +39,32 @@ const amadSchema = new mongoose.Schema(
     commodity: {
       type: String,
       require: false,
+      trim: true,
       default: "",
     },
     kism: {
       type: String,
       require: false,
+      trim: true,
       default: " ",
     },
     lotNo: {
       type: String,
+      trim: true,
       require: true,
     },
     year: {
       type: Number,
+      min: 1000,
+      max: 9999,
       require: true,
+      index: true,
+      validate: {
+        validator: function (val) {
+          return val.toString().length === 4;
+        },
+        message: (val) => `${val.value} has to be 4 digits`,
+      },
     },
     chamberNo: {
       type: Number,
