@@ -3,11 +3,14 @@ const utils = require("./../util/utils");
 const SQL = require("./../util/sql");
 const ADODB = require("node-adodb");
 const config = require("./../config/config");
-const loggger = config.logger;
+const logger = config.logger;
 const Amad = require("./../model/Amad");
+const Account = require("./../model/Account");
+const Partyledger = require("./../model/Partyledger");
+const constants = require("./../util/constants");
 
 const mongoose = require("mongoose");
-mongoose.connect(config.URL_CS_DEV);
+mongoose.connect(config.LOCALDB_CS_DEV);
 
 async function readDataFile(dataFile) {
   try {
@@ -17,62 +20,99 @@ async function readDataFile(dataFile) {
     //loadGrp
     await loadData(connection, dataFile);
     //load Amad
-    await readAmad(connection, dataFile);
+    // await readAmad(connection, dataFile);
     //load Grp
   } catch (e) {
-    loggger.error(e);
+    logger.error(e);
   }
 }
 
 async function loadData(connection, dataFile) {
-  const grpTable = await connection.query(
-    "SELECT descrip,add1,under,open,dr,close,balance,Nature,openOTHER,AccName from grp"
-  );
-  for (let i = 0; i <= grpTable.length; i++) {
-    let grpRecord = grpTable[i];
-    if (!(grpRecord == undefined)) {
-      console.log("grpRecord ==> " + grpRecord);
+  try {
+    const coldId = utils.getSubmitter(dataFile);
+    const year = utils.getYear(dataFile);
+    const grpTable = await connection.query(constants.GRP_QUERY);
+    for (let i = 0; i < grpTable.length; i++) {
+      let grpRecord = grpTable[i];
+      let partyName = grpRecord.descrip;
+      logger.info("grpRecord ==> " + partyName);
+      //grp
+      const account = await Account.create({
+        coldId: coldId,
+        year: year,
+        accountName: grpRecord.descrip,
+        address: grpRecord.add1,
+        subGroup: grpRecord.under,
+        open: grpRecord.open,
+        dr: grpRecord.dr,
+        close: grpRecord.close,
+        balance: grpRecord.balance,
+        nature: grpRecord.Nature,
+        openOTHER: grpRecord.openOTHER,
+        AccName: grpRecord.AccName,
+        kName: grpRecord.KName,
+        fName: grpRecord.FName,
+        fRelation: grpRecord.FRelation,
+      });
+      account.save();
+      logger.info(account);
 
-      //populate grp schema.
-      const amadData = await connection.query(
-        `SELECT AMADNO,DATE,PARTY,VILL,PKT3,COMM ,KISM ,MARK1 ,YR,Room ,chatta,gulla from amad where PARTY = ${grpRecord.descrip}`
-      );
-      for (let i = 0; i <= amadData.length; i++) {
-        let amadRecord = amadData[i];
-        if (!(amadRecord == undefined)) {
-          const amad = await Amad.create({
-            coldId: coldId,
-            amadNo: amadRecord.AMADNO,
-            entryDate: amadRecord.DATE,
-            party: amadRecord.PARTY,
-            village: amadRecord.VILL,
-            packets: amadRecord.PKT3,
-            commodity: amadRecord.COMM,
-            kism: amadRecord.KISM,
-            lotNo: amadRecord.MARK1,
-            year: amadRecord.DATE.substring(0, 4),
-            chamberNo: amadRecord.Room,
-            chatta: amadRecord.chatta,
-            gulla: amadRecord.gulla,
-          });
-          amad.save();
-          loggger.info(amad);
-        }
+      //amad
+      let amadQuery = constants.AMAD_QUERY + partyName + constants.SINGLE_QUOTE;
+      const amadRows = await connection.query(amadQuery);
+      for (let i = 0; i < amadRows.length; i++) {
+        let amadRow = amadRows[i];
+        logger.info("amadRecord ==>" + amadRow.PARTY);
+        const amad = await Amad.create({
+          coldId: coldId,
+          amadNo: amadRow.AMADNO,
+          entryDate: amadRow.DATE,
+          accountName: amadRow.PARTY,
+          village: amadRow.VILL,
+          packets: amadRow.PKT3,
+          commodity: amadRow.COMM,
+          kism: amadRow.KISM,
+          lotNo: amadRow.MARK1,
+          year: amadRow.DATE.substring(0, 4),
+          chamberNo: amadRow.Room,
+          chatta: amadRow.chatta,
+          gulla: amadRow.gulla,
+        });
+        amad.save();
+        logger.info(amad);
       }
-      //load partyACC data.
-      const partyACC = await connection.query(
-        `select Code,BankCode,Branch,AccNo,IFSC,Chq1,Chq2,Chq3,BankName,AccName,Want2Print from Party where DESC = ${grpRecord.descrip}`
-      );
 
-      for (let i = 0; i <= partyACC.length; i++) {
-        let partyacc = partyACC[i];
-        if (!(partyacc == undefined)) {
-          console.log("partyacc ==> " + partyacc);
-        }
+      //same do here fro partyledger.
+      let partyledgerQuery =
+        constants.PARTY_LEDGER_QUERY + partyName + constants.SINGLE_QUOTE;
+      const partyledgerRows = await connection.query(partyledgerQuery);
+      for (let i = 0; i < partyledgerRows.length; i++) {
+        let partyledgerRow = partyledgerRows[i];
+        logger.info("partyledgerRow ==> " + partyledgerRow.name);
+        const partyledger = await Partyledger.create({
+          coldId: coldId,
+          year: year,
+          accountName: partyledgerRow.name,
+          vouchtype: partyledgerRow.vouch_type,
+          entryDate: partyledgerRow.date,
+          amount: partyledgerRow.amount,
+          acc: partyledgerRow.acc,
+          loan: partyledgerRow.Loan,
+          rent: partyledgerRow.Rent,
+          interest: partyledgerRow.Intrst,
+          oth: partyledgerRow.Oth,
+          bardana: partyledgerRow.Bar,
+          bardanaRate: partyledgerRow.BarRate,
+          bardanaQtyIn: partyledgerRow.BarQtyIn,
+          bardanaQtyOut: partyledgerRow.BarQtyOut,
+          inWords: partyledgerRow.InWords,
+        });
+        partyledger.save();
+        logger.info(partyledger);
       }
-
-      //same do here fro partylazer.
     }
+  } catch (e) {
+    logger.info(e.message);
   }
 }
 
@@ -80,9 +120,9 @@ async function readAmad(connection, dataFile) {
   try {
     // Query the DB
     const amadTable = await connection.query(SQL.AMAD);
-    loggger.info(`amadTable.length ==> ${amadTable.length}`);
+    logger.info(`amadTable.length ==> ${amadTable.length}`);
     const coldId = utils.getSubmitter(dataFile);
-    for (let i = 0; i <= amadTable.length; i++) {
+    for (let i = 0; i < amadTable.length; i++) {
       let amadRecord = amadTable[i];
       if (!(amadRecord == undefined)) {
         const amad = await Amad.create({
@@ -101,11 +141,11 @@ async function readAmad(connection, dataFile) {
           gulla: amadRecord.gulla,
         });
         amad.save();
-        loggger.info(amad);
+        logger.info(amad);
       }
     }
   } catch (e) {
-    loggger.info(e.message);
+    logger.info(e.message);
   }
 }
 //exports

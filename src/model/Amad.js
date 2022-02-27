@@ -18,7 +18,7 @@ const amadSchema = new mongoose.Schema(
       require: true,
       default: () => Date.now(),
     },
-    party: {
+    accountName: {
       type: String,
       require: true,
       minLength: 1,
