@@ -35,7 +35,7 @@ const accountSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
-    open: {
+    open: {  
       type: Number,
     },
     dr: {

@@ -1,33 +1,22 @@
 {
-  "name": "cs-inbound-data-processor-mern",
+  "name": "cd_ibound-data_processor",
   "version": "1.0.0",
-  "description": "cold-storage inbound data processor with mern stack.\r this project read cold inbound data file and load into mongo db.",
-  "main": "src/index.js",
+  "description": "",
+  "main": "index.js",
   "scripts": {
     "start": "node src/index.js",
-    "nodemon": "nodemon src/index.js"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/storagecold/cs-inbound-data-processor-mern.git"
-  },
-  "author": "",
+  "author": "Pamnkaj Rajput",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/storagecold/cs-inbound-data-processor-mern/issues"
-  },
-  "homepage": "https://github.com/storagecold/cs-inbound-data-processor-mern#readme",
   "dependencies": {
-    "body-parser": "^1.19.1",
+    "body-parser": "^1.19.2",
     "dotenv": "^16.0.0",
-    "express": "^4.17.2",
-    "mongodb": "^4.3.0",
-    "mongoose": "^6.1.6",
+    "express": "^4.17.3",
+    "mongodb": "^4.4.1",
+    "mongoose": "^6.2.9",
     "node-adodb": "^5.0.3",
     "node-schedule": "^2.1.0",
-    "winston": "^3.5.0"
-  },
-  "devDependencies": {
-    "nodemon": "^2.0.15"
+    "winston": "^3.6.0"
   }
 }
